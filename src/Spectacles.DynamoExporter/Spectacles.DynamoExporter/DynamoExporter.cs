@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Autodesk.DesignScript.Geometry;
 using Spectacles.Net;
 using Spectacles.Net.Data;
 
@@ -13,20 +12,23 @@ namespace Spectacles.DynamoExporter
   internal class DynamoExporter : BaseSpectaclesExporter
   {
     private Metadata _metadata;
-    private List<SpectaclesGeometry> _spectaclesGeometries;
-    private List<SpectaclesMaterial> _spectaclesMaterials;
-    private SpectaclesObject _spectaclesObject;
 
 
     private readonly List<SpectaclesGeometry> _inputGeometries;
+    private readonly List<SpectaclesMaterial> _inputMaterials;
+    private readonly SpectaclesObject _inputObject;
 
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="inputGeometries">Dynamo geometry from node input to convert</param>
-    internal DynamoExporter(List<SpectaclesGeometry> inputGeometries)
+    /// <param name="inputMaterials"></param>
+    /// <param name="inputObject"></param>
+    internal DynamoExporter(List<SpectaclesGeometry> inputGeometries, List<SpectaclesMaterial> inputMaterials, SpectaclesObject inputObject)
     {
       _inputGeometries = inputGeometries;
+      _inputMaterials = inputMaterials;
+      _inputObject = inputObject;
     }
     
     /// <summary>
@@ -40,8 +42,6 @@ namespace Spectacles.DynamoExporter
       _metadata.generator = "DynamoExporter";
       _metadata.version   = 1.0;
       _metadata.type      = "Object";
-      
-      Console.WriteLine(_metadata);
     }
 
     /// <summary>
@@ -50,21 +50,16 @@ namespace Spectacles.DynamoExporter
     /// <param name="spectaclesGeometries">List of SpectaclesGeometry objects</param>
     public override void OnAddGeometries(List<SpectaclesGeometry> spectaclesGeometries)
     {
-      _spectaclesGeometries = spectaclesGeometries;
-      _spectaclesGeometries.AddRange(_inputGeometries);
+      spectaclesGeometries.AddRange(_inputGeometries);
     }
 
     /// <summary>
     /// Provides SpectaclesMaterial list to add materials to
     /// </summary>
-    /// <param name="materials">List of SpectaclesMaterial objects</param>
-    public override void OnAddMaterials(List<SpectaclesMaterial> materials)
+    /// <param name="spectaclesMaterials">List of SpectaclesMaterial objects</param>
+    public override void OnAddMaterials(List<SpectaclesMaterial> spectaclesMaterials)
     {
-      _spectaclesMaterials = materials;
-
-      // TODO convert Dynamo materials to Spectacles materials
-      
-      Console.WriteLine(_spectaclesMaterials);
+      spectaclesMaterials.AddRange(_inputMaterials);
     }
 
     /// <summary>
@@ -73,11 +68,10 @@ namespace Spectacles.DynamoExporter
     /// <param name="spectaclesObject">A SpectaclesObject instance</param>
     public override void OnAddSpectacleObject(SpectaclesObject spectaclesObject)
     {
-      _spectaclesObject = spectaclesObject;
-
-      // TODO convert Dynamo scenes to Spectacles scenes
-      
-      Console.WriteLine(_spectaclesObject);
+      spectaclesObject.uuid = _inputObject.uuid;
+      spectaclesObject.children = _inputObject.children;
+      spectaclesObject.type = _inputObject.type;
+      spectaclesObject.matrix = _inputObject.matrix;
     }
 
     /// <summary>
