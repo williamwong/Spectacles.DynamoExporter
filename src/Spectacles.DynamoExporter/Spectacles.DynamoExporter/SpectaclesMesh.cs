@@ -46,7 +46,7 @@ namespace Spectacles.DynamoExporter
     /// <param name="mesh">mesh to create</param>
     /// <param name="color">color to apply to the mesh</param>
     /// <returns>A Spectacles Geometry that can be exported by the Scene compiler</returns>
-    [MultiReturn("SpectaclesGeometry", "originalMesh")]
+    [MultiReturn("SpectaclesGeometry", "SpectaclesMaterial", "originalMesh")]
     public static Dictionary<string, object> ByToolkitMeshAndColor(mt.Mesh mesh, Color[] color)
     {
       var m = new SpectaclesMesh(mesh);
@@ -98,6 +98,21 @@ namespace Spectacles.DynamoExporter
       //TO DO:
       //populate vertex colors
 
+      var alpha = color[0].Alpha;
+      var red = color[0].Red.ToString("X2");
+      var green = color[0].Green.ToString("X2");
+      var blue = color[0].Blue.ToString("X2");
+
+      var mat = new SpectaclesMaterial
+      {
+          uuid = Guid.NewGuid().ToString(),
+          type = "MeshBasicMaterial",
+          color = $"0x{red}{green}{blue}",
+          side = 2,
+          opacity = 1.0,
+          transparent = true
+      };
+
       //TO DO: user data
       //populate userData objects
 
@@ -106,6 +121,7 @@ namespace Spectacles.DynamoExporter
       return new Dictionary<string, object>
       {
         {"SpectaclesGeometry", g},
+        {"SpectaclesMaterial", mat },
         {"originalMesh", m}
       };
     }

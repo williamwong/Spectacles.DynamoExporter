@@ -39,9 +39,10 @@ namespace Spectacles.DynamoExporter
     /// <param name="path">Directory to export output</param>
     /// <param name="fileName">Name of the file</param>
     /// <param name="geometries"></param>
+    /// <param name="materials"></param>
     /// <returns>The serialized JSON and a message designating success or failure</returns>
     [MultiReturn("json", "message")]
-    public static Dictionary<string, string> SceneCompiler(bool write, string path, string fileName, List<SpectaclesGeometry> geometries)
+    public static Dictionary<string, string> SceneCompiler(bool write, string path, string fileName, List<SpectaclesGeometry> geometries, List<SpectaclesMaterial> materials)
     {
       if (!write)
       {
@@ -80,18 +81,18 @@ namespace Spectacles.DynamoExporter
 //        }
 //      };
 
-      var testMaterials = new List<SpectaclesMaterial>
-      {
-        new SpectaclesMaterial
-        {
-          uuid = "18114196-238c-440d-a7ce-14d516a8a3da",
-          type = "MeshBasicMaterial",
-          color = "0xFF0000",
-          side = 2,
-          opacity = 1.0,
-          transparent = true
-        }
-      };
+//      var testMaterials = new List<SpectaclesMaterial>
+//      {
+//        new SpectaclesMaterial
+//        {
+//          uuid = "18114196-238c-440d-a7ce-14d516a8a3da",
+//          type = "MeshBasicMaterial",
+//          color = "0xFF0000",
+//          side = 2,
+//          opacity = 1.0,
+//          transparent = true
+//        }
+//      };
 
       var testObject = new SpectaclesObject
       {
@@ -106,7 +107,7 @@ namespace Spectacles.DynamoExporter
             name = "mesh0",
             type = "Mesh",
             geometry = geometries[0].uuid,
-            material = testMaterials[0].uuid,
+            material = materials[0].uuid,
             matrix = new double[] {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
             userData = new Dictionary<string, string>()
           }
@@ -117,7 +118,7 @@ namespace Spectacles.DynamoExporter
       testObject.userData.Add("layers", "Default");
       testObject.children[0].userData.Add("layer", "Default");
 
-      var exporter = new DynamoExporter(geometries, testMaterials, testObject);
+      var exporter = new DynamoExporter(geometries, materials, testObject);
 
       try
       {
