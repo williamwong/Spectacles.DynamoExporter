@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using Autodesk.DesignScript.Geometry;
-using Autodesk.DesignScript.Runtime;
 using Spectacles.Net.Data;
 using mt = Autodesk.Dynamo.MeshToolkit;
 using Autodesk.DesignScript.Interfaces;
+using Autodesk.DesignScript.Runtime;
 using DSCore;
-using Dynamo.Visualization;
 
 namespace Spectacles.DynamoExporter
 {
@@ -23,6 +20,7 @@ namespace Spectacles.DynamoExporter
         /// <param name="mesh">mesh to create</param>
         /// <param name="color">color to apply to the mesh</param>
         /// <returns>A Spectacles Geometry that can be exported by the Scene compiler</returns>
+        [MultiReturn("SpectaclesGeometry", "originalMesh")]
         public static Dictionary<string, object> ByToolkitMeshAndColor(mt.Mesh mesh, Color[] color)
         {
             SpectaclesMesh m = new SpectaclesMesh(mesh);
@@ -53,16 +51,21 @@ namespace Spectacles.DynamoExporter
                 data.vertices.Add(System.Math.Round(v.Y, 5));
             }
 
-            int faceNumber = mesh.VertexIndicesByTri().Count / 3;
+            //int faceNumber = mesh.VertexIndicesByTri().Count / 3;
 
             //populate faces
-            for (int i = 0; i < faceNumber; i++)
+            for (int i = 0; i < mesh.VertexIndicesByTri().Count; i+=3)
             {
-                data.faces.Add(i);
-            }
+        data.faces.Add(0);
 
-            //this will display the mesh
-            mt.Display.MeshDisplay displayMesh = mt.Display.MeshDisplay.ByMeshColor(mesh, color);
+        data.faces.Add(mesh.VertexIndicesByTri()[i]);
+        data.faces.Add(mesh.VertexIndicesByTri()[i+1]);
+        data.faces.Add(mesh.VertexIndicesByTri()[i+2]);
+
+      }
+
+      //this will display the mesh
+      mt.Display.MeshDisplay displayMesh = mt.Display.MeshDisplay.ByMeshColor(mesh, color);
 
             
 

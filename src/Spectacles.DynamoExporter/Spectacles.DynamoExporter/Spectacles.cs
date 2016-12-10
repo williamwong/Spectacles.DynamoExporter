@@ -38,9 +38,10 @@ namespace Spectacles.DynamoExporter
     /// <param name="write">Write the Spectacles JSON file to disk?</param>
     /// <param name="path">Directory to export output</param>
     /// <param name="fileName">Name of the file</param>
+    /// <param name="geometries"></param>
     /// <returns>The serialized JSON and a message designating success or failure</returns>
     [MultiReturn("json", "message")]
-    public static Dictionary<string, string> SceneCompiler(bool write, string path, string fileName)
+    public static Dictionary<string, string> SceneCompiler(bool write, string path, string fileName, List<SpectaclesGeometry> geometries)
     {
       if (!write)
       {
@@ -56,28 +57,28 @@ namespace Spectacles.DynamoExporter
 
       // TODO remove hard coded values
 
-      var testGeometries = new List<SpectaclesGeometry>
-      {
-        new SpectaclesGeometry
-        {
-          uuid = "99025f60-76d2-4749-8321-a1438550ec68",
-          type = "Geometry",
-          data = new SpectaclesGeometryData
-          {
-            vertices = new List<double>
-            {
-              0.0,0.0,0.0,-10.0,0.0,0.0,-10.0,10.0,0.0,0.0,10.0,0.0,-10.0,0.0,0.0,-10.0,0.0,10.0,-10.0,10.0,10.0,-10.0,10.0,0.0,-10.0,0.0,10.0,0.0,0.0,10.0,0.0,10.0,10.0,-10.0,10.0,10.0,0.0,0.0,10.0,0.0,0.0,0.0,0.0,10.0,0.0,0.0,10.0,10.0,0.0,0.0,0.0,0.0,0.0,10.0,-10.0,0.0,10.0,-10.0,0.0,0.0,0.0,10.0,0.0,-10.0,10.0,0.0,-10.0,10.0,10.0,0.0,10.0,10.0
-            },
-            faces = new List<int>()
-            {
-              0,0,1,2,0,2,3,0,0,4,5,6,0,6,7,4,0,8,9,10,0,10,11,8,0,12,13,14,0,14,15,12,0,16,17,18,0,18,19,16,0,20,21,22,0,22,23,20
-            },
-            normals = new List<double>(),
-            uvs = new List<double>(),
-            scale = 1
-          }
-        }
-      };
+//      var testGeometries = new List<SpectaclesGeometry>
+//      {
+//        new SpectaclesGeometry
+//        {
+//          uuid = "99025f60-76d2-4749-8321-a1438550ec68",
+//          type = "Geometry",
+//          data = new SpectaclesGeometryData
+//          {
+//            vertices = new List<double>
+//            {
+//              0.0,0.0,0.0,-10.0,0.0,0.0,-10.0,10.0,0.0,0.0,10.0,0.0,-10.0,0.0,0.0,-10.0,0.0,10.0,-10.0,10.0,10.0,-10.0,10.0,0.0,-10.0,0.0,10.0,0.0,0.0,10.0,0.0,10.0,10.0,-10.0,10.0,10.0,0.0,0.0,10.0,0.0,0.0,0.0,0.0,10.0,0.0,0.0,10.0,10.0,0.0,0.0,0.0,0.0,0.0,10.0,-10.0,0.0,10.0,-10.0,0.0,0.0,0.0,10.0,0.0,-10.0,10.0,0.0,-10.0,10.0,10.0,0.0,10.0,10.0
+//            },
+//            faces = new List<int>()
+//            {
+//              0,0,1,2,0,2,3,0,0,4,5,6,0,6,7,4,0,8,9,10,0,10,11,8,0,12,13,14,0,14,15,12,0,16,17,18,0,18,19,16,0,20,21,22,0,22,23,20
+//            },
+//            normals = new List<double>(),
+//            uvs = new List<double>(),
+//            scale = 1
+//          }
+//        }
+//      };
 
       var testMaterials = new List<SpectaclesMaterial>
       {
@@ -104,7 +105,7 @@ namespace Spectacles.DynamoExporter
             uuid = "28fbff18-819b-41e2-9bd2-38a9a139f169",
             name = "mesh0",
             type = "Mesh",
-            geometry = testGeometries[0].uuid,
+            geometry = geometries[0].uuid,
             material = testMaterials[0].uuid,
             matrix = new double[] {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
             userData = new Dictionary<string, string>()
@@ -116,7 +117,7 @@ namespace Spectacles.DynamoExporter
       testObject.userData.Add("layers", "Default");
       testObject.children[0].userData.Add("layer", "Default");
 
-      var exporter = new DynamoExporter(testGeometries, testMaterials, testObject);
+      var exporter = new DynamoExporter(geometries, testMaterials, testObject);
 
       try
       {
