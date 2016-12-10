@@ -18,15 +18,15 @@ namespace Spectacles.DynamoExporter
     private SpectaclesObject _spectaclesObject;
 
 
-    private readonly Geometry _dynamoGeometry;
+    private readonly List<SpectaclesGeometry> _inputGeometries;
 
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="dynamoGeometry">Dynamo geometry from node input to convert</param>
-    internal DynamoExporter(Geometry dynamoGeometry)
+    /// <param name="inputGeometries">Dynamo geometry from node input to convert</param>
+    internal DynamoExporter(List<SpectaclesGeometry> inputGeometries)
     {
-      _dynamoGeometry = dynamoGeometry;
+      _inputGeometries = inputGeometries;
     }
     
     /// <summary>
@@ -47,15 +47,11 @@ namespace Spectacles.DynamoExporter
     /// <summary>
     /// Provides SpectaclesGeometry list to add geometry to
     /// </summary>
-    /// <param name="geometries">List of SpectaclesGeometry objects</param>
-    public override void OnAddGeometries(List<SpectaclesGeometry> geometries)
+    /// <param name="spectaclesGeometries">List of SpectaclesGeometry objects</param>
+    public override void OnAddGeometries(List<SpectaclesGeometry> spectaclesGeometries)
     {
-      _spectaclesGeometries = geometries;
-
-      // TODO convert Dynamo geometry to Spectacles geometry
-      
-      Console.WriteLine(_dynamoGeometry);
-      Console.WriteLine(_spectaclesGeometries);
+      _spectaclesGeometries = spectaclesGeometries;
+      _spectaclesGeometries.AddRange(_inputGeometries);
     }
 
     /// <summary>

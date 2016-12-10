@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Autodesk.DesignScript.Geometry;
 using Autodesk.DesignScript.Runtime;
+using Spectacles.Net.Data;
 
 namespace Spectacles.DynamoExporter
 {
@@ -38,10 +38,10 @@ namespace Spectacles.DynamoExporter
     /// <param name="write">Write the Spectacles JSON file to disk?</param>
     /// <param name="path">Directory to export output</param>
     /// <param name="fileName">Name of the file</param>
-    /// <param name="geometry">Geometry to input</param>
+    /// <param name="spectaclesGeometries">Geometry to input</param>
     /// <returns>The serialized JSON and a message designating success or failure</returns>
     [MultiReturn("json", "message")]
-    public static Dictionary<string, string> SceneCompiler(bool write, string path, string fileName, Geometry geometry)
+    public static Dictionary<string, string> SceneCompiler(bool write, string path, string fileName, List<SpectaclesGeometry> spectaclesGeometries)
     {
       if (!write)
       {
@@ -55,7 +55,7 @@ namespace Spectacles.DynamoExporter
 
       var outputPath = Path.Combine(path, fileName);
 
-      var exporter = new DynamoExporter(geometry);
+      var exporter = new DynamoExporter(spectaclesGeometries);
 
       try
       {
