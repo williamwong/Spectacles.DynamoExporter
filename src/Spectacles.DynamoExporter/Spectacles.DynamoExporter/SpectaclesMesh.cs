@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Autodesk.DesignScript.Interfaces;
 using Autodesk.DesignScript.Runtime;
-using Autodesk.Dynamo.MeshToolkit.Display;
 using DSCore;
 using Spectacles.Net.Data;
 using mt = Autodesk.Dynamo.MeshToolkit;
@@ -10,14 +9,36 @@ using Math = System.Math;
 
 namespace Spectacles.DynamoExporter
 {
+  /// <summary>
+  /// 
+  /// </summary>
   public class SpectaclesMesh : IGraphicItem
   {
+    private readonly mt.Mesh _mesh;
+
     private SpectaclesMesh(mt.Mesh mesh)
     {
       _mesh = mesh;
     }
 
-    private readonly mt.Mesh _mesh;
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="package"></param>
+    /// <param name="parameters"></param>
+    [IsVisibleInDynamoLibrary(false)]
+    public void Tessellate(IRenderPackage package, TessellationParameters parameters)
+    {
+      var counter = 0;
+
+      foreach (var v in _mesh.Vertices())
+      {
+        package.AddTriangleVertex(v.X, v.Y, v.Z);
+        var p = _mesh.VertexNormals()[counter];
+        package.AddTriangleVertexNormal(p.X, p.Y, p.Z);
+        counter++;
+      }
+    }
 
     /// <summary>
     ///   Creates a SpectaclesGeometry from a Dynamo Mesh
@@ -71,7 +92,7 @@ namespace Spectacles.DynamoExporter
       }
 
       //this will display the mesh
-      var displayMesh = MeshDisplay.ByMeshColor(mesh, color);
+      //var displayMesh = mt.Display.MeshDisplay.ByMeshColor(mesh, color);
 
 
       //TO DO:
@@ -87,21 +108,6 @@ namespace Spectacles.DynamoExporter
         {"SpectaclesGeometry", g},
         {"originalMesh", m}
       };
-    }
-
-    [IsVisibleInDynamoLibrary(false)]
-    public void Tessellate(IRenderPackage package, TessellationParameters parameters)
-    {
-
-      var counter = 0;
-
-      foreach (var v in _mesh.Vertices())
-      {
-        package.AddTriangleVertex(v.X, v.Y, v.Z);
-        var p = _mesh.VertexNormals()[counter];
-        package.AddTriangleVertexNormal(p.X, p.Y, p.Z);
-        counter++;
-      }
     }
   }
 }
