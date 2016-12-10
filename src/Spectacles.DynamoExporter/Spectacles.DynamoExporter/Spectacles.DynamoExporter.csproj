@@ -49,7 +49,7 @@
       <HintPath>lib\MeshToolkit.dll</HintPath>
     </Reference>
     <Reference Include="ProtoGeometry">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Dynamo\Dynamo Core\1.2\ProtoGeometry.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Dynamo\Dynamo Core\1.2\ProtoGeometry.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -74,6 +74,9 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y/Q "$(TargetPath)" "C:\Users\IrisVR Demo #3\AppData\Roaming\Dynamo\Dynamo Revit\1.2\packages\Spectacles\bin"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
