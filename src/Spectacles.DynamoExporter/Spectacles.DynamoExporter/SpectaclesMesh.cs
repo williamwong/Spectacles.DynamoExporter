@@ -15,10 +15,12 @@ namespace Spectacles.DynamoExporter
   public class SpectaclesMesh : IGraphicItem
   {
     private readonly mt.Mesh _mesh;
+    private readonly Color[] _color;
 
-    private SpectaclesMesh(mt.Mesh mesh)
+    private SpectaclesMesh(mt.Mesh mesh, Color[] color)
     {
       _mesh = mesh;
+      _color = color;
     }
 
     /// <summary>
@@ -29,15 +31,32 @@ namespace Spectacles.DynamoExporter
     [IsVisibleInDynamoLibrary(false)]
     public void Tessellate(IRenderPackage package, TessellationParameters parameters)
     {
-      var counter = 0;
+        package.RequiresPerVertexColoration=true;
+        
 
-      foreach (var v in _mesh.Vertices())
-      {
-        package.AddTriangleVertex(v.X, v.Y, v.Z);
-        var p = _mesh.VertexNormals()[counter];
-        package.AddTriangleVertexNormal(p.X, p.Y, p.Z);
-        counter++;
-      }
+        //THIS IS BUGGY, not fully working
+        for (int i = 0; i < _mesh.VertexIndicesByTri().Count; i += 3)
+            {
+                int A = _mesh.VertexIndicesByTri()[i];
+                int B= _mesh.VertexIndicesByTri()[i+1];
+                int C= _mesh.VertexIndicesByTri()[i+2];
+                package.AddTriangleVertex(_mesh.Vertices()[A].X, _mesh.Vertices()[A].Y, _mesh.Vertices()[A].Z);
+                package.AddTriangleVertex(_mesh.Vertices()[B].X, _mesh.Vertices()[B].Y, _mesh.Vertices()[B].Z);
+                package.AddTriangleVertex(_mesh.Vertices()[C].X, _mesh.Vertices()[C].Y, _mesh.Vertices()[C].Z);
+
+                //TO-DO: color by face and by vertex (probably do this in the constructor depending on the number of colors connected in the input)
+                package.AddTriangleVertexColor(_color[0].Red, _color[0].Green, _color[0].Blue, _color[0].Alpha);
+                package.AddTriangleVertexColor(_color[0].Red, _color[0].Green, _color[0].Blue, _color[0].Alpha);
+                package.AddTriangleVertexColor(_color[0].Red, _color[0].Green, _color[0].Blue, _color[0].Alpha);
+
+                package.AddTriangleVertexNormal(_mesh.TriangleNormals()[A].X, _mesh.TriangleNormals()[A].Y, _mesh.TriangleNormals()[A].Z);
+                package.AddTriangleVertexNormal(_mesh.TriangleNormals()[B].X, _mesh.TriangleNormals()[B].Y, _mesh.TriangleNormals()[B].Z);
+                package.AddTriangleVertexNormal(_mesh.TriangleNormals()[C].X, _mesh.TriangleNormals()[C].Y, _mesh.TriangleNormals()[C].Z);
+
+                package.AddTriangleVertexUV(-1.0, -1.0);
+                package.AddTriangleVertexUV(-1.0, -1.0);
+                package.AddTriangleVertexUV(-1.0, -1.0);
+            } 
     }
 
     /// <summary>
@@ -49,7 +68,7 @@ namespace Spectacles.DynamoExporter
     [MultiReturn("SpectaclesGeometry", "originalMesh")]
     public static Dictionary<string, object> ByToolkitMeshAndColor(mt.Mesh mesh, Color[] color)
     {
-      var m = new SpectaclesMesh(mesh);
+      var m = new SpectaclesMesh(mesh, color);
 
       var g = new SpectaclesGeometry
       {
