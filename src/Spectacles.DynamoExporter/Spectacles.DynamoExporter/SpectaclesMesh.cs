@@ -1,110 +1,107 @@
 ﻿using System;
 using System.Collections.Generic;
-using Autodesk.DesignScript.Geometry;
-using Spectacles.Net.Data;
-using mt = Autodesk.Dynamo.MeshToolkit;
 using Autodesk.DesignScript.Interfaces;
 using Autodesk.DesignScript.Runtime;
+using Autodesk.Dynamo.MeshToolkit.Display;
 using DSCore;
+using Spectacles.Net.Data;
+using mt = Autodesk.Dynamo.MeshToolkit;
+using Math = System.Math;
 
 namespace Spectacles.DynamoExporter
 {
-    public class SpectaclesMesh:IGraphicItem
+  public class SpectaclesMesh : IGraphicItem
+  {
+    private SpectaclesMesh(mt.Mesh mesh)
     {
+      _mesh = mesh;
+    }
 
-        private SpectaclesMesh(mt.Mesh mesh) { this._mesh = mesh; }
-        private mt.Mesh _mesh;
-        /// <summary>
-        /// Creates a SpectaclesGeometry from a Dynamo Mesh
-        /// </summary>
-        /// <param name="mesh">mesh to create</param>
-        /// <param name="color">color to apply to the mesh</param>
-        /// <returns>A Spectacles Geometry that can be exported by the Scene compiler</returns>
-        [MultiReturn("SpectaclesGeometry", "originalMesh")]
-        public static Dictionary<string, object> ByToolkitMeshAndColor(mt.Mesh mesh, Color[] color)
-        {
-            SpectaclesMesh m = new SpectaclesMesh(mesh);
+    private readonly mt.Mesh _mesh;
 
-            SpectaclesGeometry g = new SpectaclesGeometry();
-            g.uuid = Guid.NewGuid().ToString();
-            g.type = "Geometry";
+    /// <summary>
+    ///   Creates a SpectaclesGeometry from a Dynamo Mesh
+    /// </summary>
+    /// <param name="mesh">mesh to create</param>
+    /// <param name="color">color to apply to the mesh</param>
+    /// <returns>A Spectacles Geometry that can be exported by the Scene compiler</returns>
+    [MultiReturn("SpectaclesGeometry", "originalMesh")]
+    public static Dictionary<string, object> ByToolkitMeshAndColor(mt.Mesh mesh, Color[] color)
+    {
+      var m = new SpectaclesMesh(mesh);
 
-            SpectaclesGeometryData data = new SpectaclesGeometryData();
+      var g = new SpectaclesGeometry
+      {
+        uuid = Guid.NewGuid().ToString(),
+        type = "Geometry"
+      };
 
-            //populate data object properties
+      var data = new SpectaclesGeometryData
+      {
+        vertices = new List<double>(),
+        faces = new List<int>(),
+        normals = new List<double>(),
+        uvs = new List<double>(),
+        scale = 1,
+        visible = true,
+        castShadow = true,
+        receiveShadow = false,
+        doubleSided = true
+      };
 
-            data.vertices = new List<double>();
-            data.faces = new List<int>();
-            data.normals = new List<double>();
-            data.uvs = new List<double>();
-            data.scale = 1;
-            data.visible = true;
-            data.castShadow = true;
-            data.receiveShadow = false;
-            data.doubleSided = true;
+      //populate data object properties
 
-            //populate vertices
-            foreach (var v in mesh.Vertices())
-            {
-                data.vertices.Add(System.Math.Round(v.X * -1.0, 5));
-                data.vertices.Add(System.Math.Round(v.Z, 5));
-                data.vertices.Add(System.Math.Round(v.Y, 5));
-            }
 
-            //int faceNumber = mesh.VertexIndicesByTri().Count / 3;
+      //populate vertices
+      foreach (var v in mesh.Vertices())
+      {
+        data.vertices.Add(Math.Round(v.X*-1.0, 5));
+        data.vertices.Add(Math.Round(v.Z, 5));
+        data.vertices.Add(Math.Round(v.Y, 5));
+      }
 
-            //populate faces
-            for (int i = 0; i < mesh.VertexIndicesByTri().Count; i+=3)
-            {
+      //populate faces
+      for (var i = 0; i < mesh.VertexIndicesByTri().Count; i += 3)
+      {
         data.faces.Add(0);
 
         data.faces.Add(mesh.VertexIndicesByTri()[i]);
-        data.faces.Add(mesh.VertexIndicesByTri()[i+1]);
-        data.faces.Add(mesh.VertexIndicesByTri()[i+2]);
-
+        data.faces.Add(mesh.VertexIndicesByTri()[i + 1]);
+        data.faces.Add(mesh.VertexIndicesByTri()[i + 2]);
       }
 
       //this will display the mesh
-      mt.Display.MeshDisplay displayMesh = mt.Display.MeshDisplay.ByMeshColor(mesh, color);
+      var displayMesh = MeshDisplay.ByMeshColor(mesh, color);
 
-            
 
-            //TO DO:
-            //populate vertex colors
+      //TO DO:
+      //populate vertex colors
 
-            //TO DO: user data
-            //populate userData objects
+      //TO DO: user data
+      //populate userData objects
 
-            g.data = data;
+      g.data = data;
 
-            return new Dictionary<string, object> {
-                { "SpectaclesGeometry", g},
-                { "originalMesh", m }
-            };
-        }
-
-        public void Tessellate(IRenderPackage package, TessellationParameters parameters)
-        {
-            //foreach (var e in _mesh.Edges())
-            //{
-            //    package.AddLineStripVertex(e.StartPoint.X, e.StartPoint.Y, e.StartPoint.Z);
-            //    package.AddLineStripVertex(e.EndPoint.X, e.EndPoint.Y, e.EndPoint.Z);
-            //}
-
-            int counter = 0;
-
-            foreach (var v in _mesh.Vertices())
-            {
-                
-                package.AddTriangleVertex(v.X, v.Y, v.Z);
-                Vector p = _mesh.VertexNormals()[counter];
-                package.AddTriangleVertexNormal(p.X,p.Y,p.Z);
-                counter++;
-                
-            }
-            
-   
-
-        }
+      return new Dictionary<string, object>
+      {
+        {"SpectaclesGeometry", g},
+        {"originalMesh", m}
+      };
     }
+
+    [IsVisibleInDynamoLibrary(false)]
+    public void Tessellate(IRenderPackage package, TessellationParameters parameters)
+    {
+
+      var counter = 0;
+
+      foreach (var v in _mesh.Vertices())
+      {
+        package.AddTriangleVertex(v.X, v.Y, v.Z);
+        var p = _mesh.VertexNormals()[counter];
+        package.AddTriangleVertexNormal(p.X, p.Y, p.Z);
+        counter++;
+      }
+    }
+  }
 }
