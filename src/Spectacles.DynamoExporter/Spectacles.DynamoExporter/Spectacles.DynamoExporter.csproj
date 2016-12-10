@@ -31,9 +31,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Display">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Dynamo\Dynamo Core\1.2\Display.dll</HintPath>
+    </Reference>
+    <Reference Include="DSCoreNodes">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Dynamo\Dynamo Core\1.2\DSCoreNodes.dll</HintPath>
+    </Reference>
+    <Reference Include="DynamoCore, Version=1.2.1.3083, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Dynamo\Dynamo Core\1.2\DynamoCore.dll</HintPath>
+    </Reference>
     <Reference Include="DynamoServices">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Dynamo\Dynamo Core\1.2\DynamoServices.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Dynamo\Dynamo Core\1.2\DynamoServices.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="MeshToolkit">
+      <HintPath>lib\MeshToolkit.dll</HintPath>
     </Reference>
     <Reference Include="ProtoGeometry">
       <HintPath>..\..\..\..\..\..\..\Program Files\Dynamo\Dynamo Core\1.2\ProtoGeometry.dll</HintPath>
@@ -52,6 +65,7 @@
     <Compile Include="DynamoExporter.cs" />
     <Compile Include="Spectacles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpectaclesMesh.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Spectacles.Net\src\Spectacles.Net\Spectacles.Net\Spectacles.Net.csproj">
